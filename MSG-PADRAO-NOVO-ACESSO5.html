@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gerador de Mensagens</title>
+  <link rel="icon" type="image/png" href="fav-gm.png">
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+    textarea { height: 300px; }
+    .senha-container, .login-container { display: flex; align-items: center; gap: 10px; }
+    .login-dominio { white-space: nowrap; font-weight: bold; }
+    .botoes-container { display: flex; justify-content: flex-end; gap: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Gerador de Mensagens</h2>
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="acesso-tab" data-bs-toggle="tab" data-bs-target="#acesso" type="button" role="tab">Acesso CORWS</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="aprovacao-tab" data-bs-toggle="tab" data-bs-target="#aprovacao" type="button" role="tab">Aprovação Remota</button>
+    </li>
+  </ul>
+  <div class="tab-content mt-3">
+    <!-- Aba de Acesso CORWS -->
+    <div class="tab-pane fade show active" id="acesso" role="tabpanel">
+      <label>Nome do Cliente:</label>
+      <input type="text" id="cliente" class="form-control" placeholder="Ex: Sistema de Teste">
+
+      <label class="mt-2">Novo Login:</label>
+      <div class="login-container">
+        <input type="text" id="login" class="form-control" placeholder="Ex: teste.corporativo">
+        <span class="login-dominio">.mags@coritec.com</span>
+      </div>
+
+      <label class="mt-2">Senha Gerada:</label>
+      <div class="senha-container">
+        <input type="password" id="senha" class="form-control" placeholder="Ex: 7VUzDZC71RdeWJU">
+        <input type="checkbox" id="mostrarSenha" onclick="toggleSenha()"> Mostrar
+      </div>
+
+      <button class="btn btn-primary mt-3" onclick="gerarMensagem()">Gerar Mensagem</button>
+
+      <label class="mt-3">Mensagem Gerada:</label>
+      <textarea id="mensagem" class="form-control" readonly></textarea>
+
+      <div class="botoes-container mt-2" id="botoesExtras" style="display: none;">
+        <button class="btn btn-outline-secondary" onclick="copiarMensagem()">📋 Copiar</button>
+        <button class="btn btn-outline-danger" onclick="resetarTudo()">🔄 Novo</button>
+      </div>
+    </div>
+
+    <!-- Aba de Aprovação Remota -->
+    <div class="tab-pane fade" id="aprovacao" role="tabpanel">
+      <p>A mensagem abaixo será enviada para obter aprovação para atendimento remoto:</p>
+      <button class="btn btn-primary mb-2" onclick="gerarAprovacao()">Gerar Mensagem</button>
+      <textarea id="mensagemAprovacao" class="form-control" readonly></textarea>
+      <div class="botoes-container mt-2" id="botoesAprovacao" style="display: none;">
+        <button class="btn btn-outline-secondary" onclick="copiarAprovacao()">📋 Copiar</button>
+        <button class="btn btn-outline-danger" onclick="limparAprovacao()">🔄 Novo</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSenha() {
+      const senhaInput = document.getElementById('senha');
+      senhaInput.type = senhaInput.type === 'password' ? 'text' : 'password';
+    }
+
+    function gerarMensagem() {
+      const cliente = document.getElementById('cliente').value.trim();
+      const login = document.getElementById('login').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+
+      if (!cliente || !login || !senha) {
+        alert("Por favor, preencha todos os campos antes de gerar a mensagem.");
+        return;
+      }
+
+      const usuarioCompleto = `${login}.mags@coritec.com`;
+
+      const msg = `Acesso à nova plataforma CORWS Multiplex - Credenciais de Login\n\n` +
+        `Prezado(a) ${cliente},\n\n` +
+        `É com satisfação que informamos que seu acesso à plataforma CORWS Multiplex, para monitoramento do abastecimento de GNV, já está disponível.\n\n` +
+        `Credenciais de acesso:\n` +
+        `▸ URL de acesso: http://www.corws.com.ar/login\n` +
+        `▸ Usuário: ${usuarioCompleto}\n` +
+        `▸ Senha: ${senha}\n\n` +
+        `Orientações importantes:\n` +
+        `Suporte: Em caso de dificuldades, entre em contato conosco pelo e-mail [tecnicos@grupomags.com.br] ou telefone [21 97878-1188].\n\n` +
+        `Estamos à disposição para esclarecer dúvidas e garantir uma experiência fluida na nova plataforma.\n\n` +
+        `Atenciosamente,\n` +
+        `Angelo M. M. da Silva\n` +
+        `Técnico de Manutenção Pleno | GRUPO MAGS\n` +
+        `21 97878-1188 | tecnicos@grupomags.com.br`;
+
+      document.getElementById('mensagem').value = msg;
+      document.getElementById('botoesExtras').style.display = 'flex';
+    }
+
+    function copiarMensagem() {
+      const mensagem = document.getElementById('mensagem');
+      mensagem.select();
+      document.execCommand("copy");
+      alert("Mensagem copiada para a área de transferência.");
+    }
+
+    function resetarTudo() {
+      document.getElementById('cliente').value = "";
+      document.getElementById('login').value = "";
+      document.getElementById('senha').value = "";
+      document.getElementById('mensagem').value = "";
+      document.getElementById('botoesExtras').style.display = 'none';
+      document.getElementById('mostrarSenha').checked = false;
+      document.getElementById('senha').type = 'password';
+    }
+
+    function gerarAprovacao() {
+      const hora = new Date().getHours();
+      let saudacao = "Bom dia!";
+      if (hora >= 12 && hora < 18) saudacao = "Boa tarde!";
+      else if (hora >= 18 || hora < 5) saudacao = "Boa noite!";
+
+      const texto = `${saudacao}\n\n` +
+        `Conforme conversamos anteriormente, para a realização do atendimento remoto é necessário o seu consentimento formal.\n\n` +
+        `Você autoriza que nosso técnico realize o atendimento remoto neste momento?\n\n` +
+        `*(Esta mensagem será registrada como comprovação de autorização e anexada à ordem de serviço.)*`;
+
+      document.getElementById('mensagemAprovacao').value = texto;
+      document.getElementById('botoesAprovacao').style.display = 'flex';
+    }
+
+    function copiarAprovacao() {
+      const mensagem = document.getElementById('mensagemAprovacao');
+      mensagem.select();
+      document.execCommand("copy");
+      alert("Mensagem copiada para a área de transferência.");
+    }
+
+    function limparAprovacao() {
+      document.getElementById('mensagemAprovacao').value = "";
+      document.getElementById('botoesAprovacao').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
